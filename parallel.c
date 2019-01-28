@@ -5,7 +5,7 @@
 #define W 2048
 #define H 2048
 
-#define B 4
+#define B 2
 #define Nmax 256
 #define Ncolor 256
 #define P 4
@@ -51,6 +51,8 @@ int main(int argc, char *argv[]) {
 
     float x0 = 0;
     float y0 = 0;
+    
+    int zoom = 2;
 
 
 
@@ -67,8 +69,8 @@ int main(int argc, char *argv[]) {
             // we get in the order of the process
             rc = MPI_Recv(color, W * H / P, MPI_UNSIGNED_CHAR, t + 1, tag, MPI_COMM_WORLD, &status);
 
-
-            // write results to file
+            // each process compute H/P rows
+            // write results to file row by row
             for (j = 0; j < H / P; j++) {
                 for (i = 0; i < W; i++)
                     fprintf(fp, "%hhu ", color[i + j * W]);
@@ -81,20 +83,20 @@ int main(int argc, char *argv[]) {
         unsigned char color[W * H / P];
         int k;
         // get difference between two pixels on the imaginary plane
-        int dx = 2 * B / (W - 1);
-        int dy = 2 * B / (H - 1);
+        float dx = 2.0 * B / (W - 1);
+        float dy = 2.0 * B / (H - 1);
 
         // use 1 based process rank to get offset in x axis
         int x_offset = (rank - 1) * H / P;
 
-        // Along x axis, we only make H / P moves
+        // Along y axis, we only make H / P moves
         for (j = 0; j < H / P; j++) {
-            // along y axis we make W moves
+            // along x axis we make W moves
             for (i = 0; i < W; i++) {
 
-                color[i + j * W] = mandelbrot((i + x_offset) * dx - B, j * dy - B);
+                color[i + j * W] = mandelbrot((i * dy - B)/zoom, ((j + x_offset) * dx - B)/zoom);
 
-                //printf("point: %d, %d, %f, %f \n", i,k,x0 + b * (2.*i/(W-1) -1), y0 + b * (2.*k/(H-1) -1));
+//                 printf("point: %f, %f \n", (i * dy - B)/zoom, ((j + x_offset) * dx - B)/zoom);
 
             }
         }
