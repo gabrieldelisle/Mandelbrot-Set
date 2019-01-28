@@ -1,8 +1,8 @@
 #include <stdio.h>
 //#include <mpi.h>
 #include <math.h>
-#define M 2048
-#define N 2048
+#define W 2048
+#define H 2048
 
 #define b 4
 #define Nmax 256
@@ -25,22 +25,22 @@ int mandelbrot(float d1, float d2){
 
 int main(int argc, char const *argv[])
 {
-	unsigned char color[M*N];
+	unsigned char color[W*H];
 	float x0 = 0; float y0 = 0;
 	float zoom = 2;
 
-	for (int j = 0; j < N; j++) {
-		for (int i = 0; i < M; i++) {
-		   color[i+j*M] = mandelbrot(x0 + zoom * (2.*i/(M-1) -1), y0 + zoom * (2.*j/(N-1) -1));
+	for (int j = 0; j < H; j++) {
+		for (int i = 0; i < W; i++) {
+		   color[i+j*W] = mandelbrot(x0 + zoom * (2.*i/(W-1) -1), y0 + zoom * (2.*j/(H-1) -1));
 		}
 	}
 	
 	FILE *fp;
 	/* your computations */
 	fp = fopen("color.txt","w");
-	for (int j = 0; j < N; j++) {
-		for (int i = 0; i < M; i++)
-		   fprintf(fp, "%hhu ", color[i+j*M]);
+	for (int j = 0; j < H; j++) {
+		for (int i = 0; i < W; i++)
+		   fprintf(fp, "%hhu ", color[i+j*W]);
 		fprintf(fp, "\n");
 	}
 	fclose(fp);  
